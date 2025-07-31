@@ -1,5 +1,6 @@
 import hashlib
 import os
+import sys
 
 USERS_FILE = "users.txt"
 TASKS_DIR = "tasks"  # directory to store task files
@@ -61,24 +62,39 @@ def add_task(username):
 
     print(f"Task '{task_description}' added with ID {task_id}.")
 
+def view_tasks(username):
+    task_file = os.path.join(TASKS_DIR, f"{username}_tasks.txt")
+    if not os.path.exists(task_file):
+        print("No tasks found.")
+        return
+    print("\nYour Tasks:")
+    with open(task_file, "r") as f:
+        for line in f:
+            parts = line.strip().split("|")
+            if len(parts) == 3:
+                print(f"ID: {parts[0]}, Description: {parts[1]}, Status: {parts[2]}")
+
 def main_menu(user):
     while True:
         print("\n--- Task Manager Menu ---")
         print("1. Add a Task")
-        print("2. Logout")
+        print("2. View Tasks")
+        print("3. Logout")
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
             add_task(user)
         elif choice == "2":
+            view_tasks(user)
+        elif choice == "3":
             print("Logged out successfully.")
-            break
+            sys.exit(0)
         else:
-            print("Invalid option. Please enter a valid choice (1 or 2).")
+            print("Invalid option. Please enter a valid choice (1, 2, or 3).")
 
 if __name__ == "__main__":
     while True:
-        print("\n1. Register\n2. Login")
+        print("\n1. Register\n2. Login\n3. Logout")
         choice = input("Choose an option: ").strip()
         if choice == "1":
             register()
@@ -86,5 +102,8 @@ if __name__ == "__main__":
             user = login()
             if user:
                 main_menu(user)
+        elif choice == "3":
+            print("Goodbye!")
+            sys.exit(0)
         else:
-            print("Invalid option. Please enter 1 or 2.")
+            print("Invalid option. Please enter 1, 2, or 3.")
