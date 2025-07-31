@@ -18,31 +18,34 @@ def load_users():
     return users
 
 def register():
+    print("\n=== User Registration ===")
     users = load_users()
     username = input("Enter a new username: ").strip()
     if username in users:
-        print("Username already exists. Please try another.")
+        print("⚠️ Username already exists. Please try another.")
         return False
     password = input("Enter a new password: ").strip()
     hashed = hash_password(password)
     with open(USERS_FILE, "a") as f:
         f.write(f"{username}:{hashed}\n")
-    print("Registration successful!")
+    print("✅ Registration successful!")
     return True
 
 def login():
+    print("\n=== User Login ===")
     users = load_users()
     username = input("Enter your username: ").strip()
     password = input("Enter your password: ").strip()
     hashed = hash_password(password)
     if username in users and users[username] == hashed:
-        print("Login successful!")
+        print(f"✅ Login successful! Welcome, {username}!")
         return username
     else:
-        print("Invalid credentials.")
+        print("❌ Invalid credentials.")
         return None
 
 def add_task(username):
+    print("\n📌 Add New Task")
     if not os.path.exists(TASKS_DIR):
         os.makedirs(TASKS_DIR)
 
@@ -60,24 +63,29 @@ def add_task(username):
     with open(task_file, "a") as f:
         f.write(f"{task_id}|{task_description}|Pending\n")
 
-    print(f"Task '{task_description}' added with ID {task_id}.")
+    print(f"✅ Task added with ID {task_id}.")
 
 def view_tasks(username):
+    print("\n📋 Your Task List")
     task_file = os.path.join(TASKS_DIR, f"{username}_tasks.txt")
-    if not os.path.exists(task_file):
-        print("No tasks found.")
+    if not os.path.exists(task_file) or os.path.getsize(task_file) == 0:
+        print("ℹ️ No tasks found.")
         return
-    print("\nYour Tasks:")
     with open(task_file, "r") as f:
+        print("-" * 40)
+        print(f"{'ID':<5} {'Description':<20} {'Status':<10}")
+        print("-" * 40)
         for line in f:
             parts = line.strip().split("|")
             if len(parts) == 3:
-                print(f"ID: {parts[0]}, Description: {parts[1]}, Status: {parts[2]}")
+                print(f"{parts[0]:<5} {parts[1]:<20} {parts[2]:<10}")
+        print("-" * 40)
 
 def mark_task_completed(username):
+    print("\n✅ Mark Task as Completed")
     task_file = os.path.join(TASKS_DIR, f"{username}_tasks.txt")
     if not os.path.exists(task_file):
-        print("No tasks to mark as completed.")
+        print("ℹ️ No tasks to update.")
         return
 
     task_id = input("Enter the ID of the task to mark as completed: ").strip()
@@ -89,10 +97,10 @@ def mark_task_completed(username):
             parts = line.strip().split("|")
             if len(parts) == 3 and parts[0] == task_id:
                 if parts[2] == "Completed":
-                    print("Task is already completed.")
+                    print("⚠️ Task is already completed.")
                 else:
                     parts[2] = "Completed"
-                    print(f"Task ID {task_id} marked as completed.")
+                    print(f"✅ Task ID {task_id} marked as completed.")
                 updated = True
                 new_lines.append("|".join(parts) + "\n")
             else:
@@ -102,12 +110,13 @@ def mark_task_completed(username):
         f.writelines(new_lines)
 
     if not updated:
-        print("Task ID not found.")
+        print("❌ Task ID not found.")
 
 def delete_task(username):
+    print("\n🗑️ Delete Task")
     task_file = os.path.join(TASKS_DIR, f"{username}_tasks.txt")
     if not os.path.exists(task_file):
-        print("No tasks to delete.")
+        print("ℹ️ No tasks to delete.")
         return
 
     task_id = input("Enter the ID of the task to delete: ").strip()
@@ -126,18 +135,18 @@ def delete_task(username):
         f.writelines(new_lines)
 
     if deleted:
-        print(f"Task ID {task_id} deleted.")
+        print(f"✅ Task ID {task_id} deleted.")
     else:
-        print("Task ID not found.")
+        print("❌ Task ID not found.")
 
 def main_menu(user):
     while True:
-        print("\n--- Task Manager Menu ---")
-        print("1. Add a Task")
-        print("2. View Tasks")
-        print("3. Mark a Task as Completed")
-        print("4. Delete a Task")
-        print("5. Logout")
+        print("\n🔸🔹🔸 Task Manager Menu 🔸🔹🔸")
+        print("1. ➕ Add a Task")
+        print("2. 📄 View Tasks")
+        print("3. ✅ Mark Task as Completed")
+        print("4. 🗑️ Delete a Task")
+        print("5. 🚪 Logout")
         choice = input("Choose an option: ").strip()
 
         if choice == "1":
@@ -149,14 +158,18 @@ def main_menu(user):
         elif choice == "4":
             delete_task(user)
         elif choice == "5":
-            print("Logged out successfully.")
+            print("👋 Logged out successfully.")
             sys.exit(0)
         else:
-            print("Invalid option. Please enter a valid choice (1, 2, 3, 4, or 5).")
+            print("❌ Invalid option. Please enter a number from 1 to 5.")
 
 if __name__ == "__main__":
+    print("📌 Welcome to Task Manager with User Authentication 📌")
     while True:
-        print("\n1. Register\n2. Login\n3. Logout")
+        print("\nMain Menu")
+        print("1. 📝 Register")
+        print("2. 🔐 Login")
+        print("3. ❌ Exit")
         choice = input("Choose an option: ").strip()
         if choice == "1":
             register()
@@ -165,7 +178,7 @@ if __name__ == "__main__":
             if user:
                 main_menu(user)
         elif choice == "3":
-            print("Goodbye!")
+            print("👋 Goodbye!")
             sys.exit(0)
         else:
-            print("Invalid option. Please enter 1, 2, or 3.")
+            print("❌ Invalid option. Please enter 1, 2, or 3.")
