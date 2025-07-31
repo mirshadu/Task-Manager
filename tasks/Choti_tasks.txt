@@ -1,3 +1,2 @@
 1|sleep all day|Completed
 2|do taxes|Completed
-3|eat and annoy|Pending
